@@ -10,6 +10,7 @@
 
 (eval-when (:execute :compile-toplevel :load-toplevel)
   (export '(expand-region
+            contract-region
             )))
 
 (defpackage :expand-region
@@ -19,6 +20,13 @@
 
 (in-package :expand-region)
 
+(eval-when (:execute :compile-toplevel :load-toplevel)
+  (export '(region/word region/symbol region/sexps
+            region/whole-string region/inside-of-string
+            )))
+
+
+
 ;;;; Utilities
 
 (eval-when (:execute :compile-toplevel :load-toplevel)
