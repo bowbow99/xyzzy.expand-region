@@ -50,9 +50,7 @@
                     (char= (char (symbol-name x) 0) #\$)))
              (get-gensym (sym)
                (or #1=(gethash sym known-gensyms)
-                   (prog1
-                       (setf #1# (gensym (format nil "~A-" (subseq (symbol-name sym) 1))))
-                     (format t "*** New gensym registered: ~S~%" sym))))
+                   (setf #1# (gensym (format nil "~A-" (subseq (symbol-name sym) 1))))))
              (replace-gensyms (form)
                (cond ((gensymp form)
                        (get-gensym form))
