@@ -34,6 +34,43 @@
     (intern (apply #'format nil name-format args))))
 
 
+(defun print-structure-object-readably (obj out)
+  (let ((def (si:*structure-definition obj)))
+    (format out "#S(~S" (si:*structure-definition-name def))
+    (dotimes (i (si:*structure-definition-nslots def))
+      (format out " ~S ~S"
+              (si:*structure-definition-slot-description def i)
+              (si:*index-slot-value obj i)))
+    (format out ")")))
+
+
+;;;; Semantic Region Object
+
+(eval-when (:execute :compile-toplevel :load-toplevel)
+  (defun print-semantic-region-object (r out n)
+    (if *print-readably*
+      (print-structure-object-readably r out)
+      (let ((start (semantic-region-start r))
+            (end   (semantic-region-end r))
+            (tag   (semantic-region-tag r)))
+        (format out "#<~S#~S (~S-~S) ~S>"
+                'semantic-region
+                tag start end
+                (buffer-substring start end))))))
+
+(defstruct (semantic-region
+            (:print-function print-semantic-region-object))
+  start end tag)
+
+(defun semantic-region-smaller (a b)
+  (or (> (semantic-region-start a)
+         (semantic-region-start b))
+      (< (semantic-region-end a)
+         (semantic-region-end b))))
+
+
+
+;;;; Semantic Region Finder
 
 (defvar-local -find-semantic-region-functions-
     nil
@@ -125,38 +162,6 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ðŽ¯•Ê‚·‚é‰½‚©")
 
 (defvar-local -semantic-regions- nil)
 
-(defun print-structure-object-readably (obj out)
-  (let ((def (si:*structure-definition obj)))
-    (format out "#S(~S" (si:*structure-definition-name def))
-    (dotimes (i (si:*structure-definition-nslots def))
-      (format out " ~S ~S"
-              (si:*structure-definition-slot-description def i)
-              (si:*index-slot-value obj i)))
-    (format out ")")))
-
-
-
-(eval-when (:execute :compile-toplevel :load-toplevel)
-  (defun print-semantic-region-object (r out n)
-    (if *print-readably*
-      (print-structure-object-readably r out)
-      (let ((start (semantic-region-start r))
-            (end   (semantic-region-end r))
-            (tag   (semantic-region-tag r)))
-        (format out "#<~S#~S (~S-~S) ~S>"
-                'semantic-region
-                tag start end
-                (buffer-substring start end))))))
-
-(defstruct (semantic-region
-            (:print-function print-semantic-region-object))
-  start end tag)
-
-(defun semantic-region-smaller (a b)
-  (or (> (semantic-region-start a)
-         (semantic-region-start b))
-      (< (semantic-region-end a)
-         (semantic-region-end b))))
 
 
 (defun %find-semantic-region (finder)
