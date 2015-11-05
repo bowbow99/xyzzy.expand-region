@@ -194,9 +194,10 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ðŽ¯•Ê‚·‚é‰½‚©")
 
 (defun try-find-semantic-region (finder)
   (interactive "Sfinder> ")
-  (msgbox "finder: ~S~%=> ~A"
-          finder
-          (%find-semantic-region finder)))
+  (let ((*package* (find-package :expand-region)))
+    (msgbox "finder: ~S~%=> ~A"
+            finder
+            (%find-semantic-region finder))))
 
 (global-set-key '(#\C-c #\t) 'try-find-semantic-region)
 
