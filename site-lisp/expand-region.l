@@ -43,6 +43,30 @@
               (si:*index-slot-value obj i)))
     (format out ")")))
 
+(defmacro with-$gensyms (&body body)
+  (let ((known-gensyms (make-hash-table)))
+    (labels ((gensymp (x)
+               (and (symbolp x)
+                    (char= (char (symbol-name x) 0) #\$)))
+             (get-gensym (sym)
+               (or #1=(gethash sym known-gensyms)
+                   (prog1
+                       (setf #1# (gensym (format nil "~A-" (subseq (symbol-name sym) 1))))
+                     (format t "*** New gensym registered: ~S~%" sym))))
+             (replace-gensyms (form)
+               (cond ((gensymp form)
+                       (get-gensym form))
+                     ((consp form)
+                       (cons (replace-gensyms (car form))
+                             (replace-gensyms (cdr form))))
+                     (t
+                       form))))
+      `(progn ,@(replace-gensyms body)))))
+
+(defmacro awhen (condition &body body)
+  `(let ((it ,condition))
+     (if it (progn ,@body))))
+
 
 ;;;; Semantic Region Object
 
@@ -81,23 +105,28 @@ END   -- リージョンの終了位置
 TAG   -- リージョンを識別する何か")
 
 (defmacro find-semantic-region (tag &body body)
-  `(handler-case
-       (let ((#1=#:start nil)
-             (#2=#:end   nil))
-         (labels ((mark-start (&optional (point (point)))
-                    (setf #1# point))
-                  (mark-end (&optional (point (point)))
-                    (setf #2# point)))
-           ,@body
-           (cond ((and (null #1#) #2#)
-                   (mark-start))
-                 ((and #1# (null #2#))
-                   (mark-end)))
-           (unless (or (null #1#)
-                       (eql #1# #2#))
-             (values #1# #2# ',tag))))
-     (quit ()
-       nil)))
+  (with-$gensyms
+   `(handler-case
+        (let (($start nil)
+              ($end   nil))
+          (labels ((mark-start (&optional (point (point)))
+                     (setf $start point))
+                   (mark-end (&optional (point (point)))
+                     (setf $end point))
+                   ($return (&key (start $start) (end $end))
+                     (make-semantic-region
+                      :start start :end end :tag ',tag)))
+            ,@body
+            (cond ((and $start        $end)
+                    ($return))
+                  ((and $start        (null $end))
+                    ($return :end (point)))
+                  ((and (null $start) $end)
+                    ($return :start (point)))
+                  ((and (null $start) (null $end))
+                    nil))))
+      (quit () nil))))
+
 
 (defmacro define-semantic-region (tag &body body)
   `(defun ,(sym "region/~A" tag) ()
@@ -137,25 +166,24 @@ TAG   -- リージョンを識別する何か")
     (forward-char)
     (end-of-string)))
 
-
-(define-semantic-region inside-of-sexp
-  (unless (and (up-list -1 t)
-               (mark-start (1+ (point)))
-               (goto-matched-parenthesis))
-    (quit)))
-
-(define-semantic-region whole-sexp
-  (unless (and (up-list -1 t)
-               (mark-start)
-               (goto-matched-parenthesis)
-               (forward-char))
-    (quit)))
+(defun region/sexps ()
+  (save-excursion
+    (labels ((new-region (start end)
+               (make-semantic-region :tag 'sexp :start start :end end)))
+      (let ((sexp-regions nil))
+        (while (up-list -1 t)
+          (let ((start (point))
+                (end   (progn
+                         (forward-sexp 1 t)
+                         (point))))
+            (push (new-region start end) sexp-regions)
+            (push (new-region (1+ start) (1- end)) sexp-regions)))
+        sexp-regions))))
 
 (setq-default -find-semantic-region-functions-
               '(region/word
                 region/symbol
-                region/inside-of-sexp
-                region/whole-sexp
+                region/sexps
                 region/inside-of-string
                 region/whole-string
                 ))
@@ -166,19 +194,23 @@ TAG   -- リージョンを識別する何か")
 
 (defun %find-semantic-region (finder)
   (ignore-errors
+   #+nil
    (multiple-value-bind (start end tag)
        (save-excursion (funcall finder))
      (when (and start
                 end)
        (make-semantic-region
-        :start start :end end :tag tag)))))
+        :start start :end end :tag tag)))
+   (funcall finder)))
 
 (defun %list-semantic-regions ()
   (let ((regions nil))
     (dolist (finder -find-semantic-region-functions-)
-      (let ((it (%find-semantic-region finder)))
-        (when it
-          (push it regions))))
+      (awhen (%find-semantic-region finder)
+        (cond ((semantic-region-p it)
+                (push it regions))
+              ((listp it)
+                (setf regions (nconc it regions))))))
     regions))
 
 (defun list-semantic-regions ()
