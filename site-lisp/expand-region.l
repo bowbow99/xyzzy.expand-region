@@ -128,7 +128,7 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
     (forward-char)
     (mark-start)
     (end-of-string)
-    (backward-char))) "abc"
+    (backward-char)))
 
 (define-semantic-region whole-string
   (when (eql (parse-point-syntax) :string)
