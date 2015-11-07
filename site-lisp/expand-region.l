@@ -193,13 +193,6 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
 
 (defun %find-semantic-region (finder)
   (ignore-errors
-   #+nil
-   (multiple-value-bind (start end tag)
-       (save-excursion (funcall finder))
-     (when (and start
-                end)
-       (make-semantic-region
-        :start start :end end :tag tag)))
    (funcall finder)))
 
 (defun %list-semantic-regions ()
