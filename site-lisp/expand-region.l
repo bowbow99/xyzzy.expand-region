@@ -268,6 +268,8 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
 
 
 
+(pushnew 'expand-region user::*rv-start-command-list*)
+(pushnew 'contract-region user::*rv-start-command-list*)
 
 
 
