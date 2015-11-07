@@ -224,13 +224,32 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ðŽ¯•Ê‚·‚é‰½‚©")
 (defun list-semantic-regions ()
   (sort (%list-semantic-regions) #'semantic-region-smaller))
 
+(defvar *semantic-regions* nil)
+
+(defun %regionize-nth-semantic-region ()
+  (regionize-semantic-region-forward
+   (nth (car *semantic-regions*)
+        (cdr *semantic-regions*))))
+
+
+
+
 (defun expand-region (&optional arg)
   (interactive)
-  (let ((*package* (find-package :expand-region)))
-    (msgbox "~{~A~%~}" (list-semantic-regions))))
+  (if *semantic-regions*
+    (unless (>= (car *semantic-regions*)
+                (1- (length (cdr *semantic-regions*))))
+      (incf (car *semantic-regions*)))
+    (setf *semantic-regions* (cons 0 (list-semantic-regions))))
+  (%regionize-nth-semantic-region))
+
+(defun contract-region (&optional arg)
+  (interactive)
+  (decf (car *semantic-regions*))
+  (%regionize-nth-semantic-region))
 
 (global-set-key #\C-\, 'expand-region)
-
+(global-set-key #\C-\. 'contract-region)
 
 (defun try-find-semantic-region (finder)
   (interactive "Sfinder> ")
