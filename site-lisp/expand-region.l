@@ -90,6 +90,14 @@
       (< (semantic-region-end a)
          (semantic-region-end b))))
 
+(defun semantic-region-equal (a b)
+  (and (= (semantic-region-start a)
+          (semantic-region-start b))
+       (= (semantic-region-end a)
+          (semantic-region-end b))
+       (msgbox "These two are equal:~2%~A~%~A" a b)))
+
+
 
 
 ;;;; Semantic Region Finder
@@ -200,10 +208,12 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ðŽ¯•Ê‚·‚é‰½‚©")
     (dolist (finder -find-semantic-region-functions-)
       (awhen (%find-semantic-region finder)
         (cond ((semantic-region-p it)
-                (push it regions))
+                (pushnew it regions :test #'semantic-region-equal))
               ((listp it)
-                (setf regions (nconc it regions))))))
+                (dolist (region it)
+                  (pushnew region regions :test #'semantic-region-equal))))))
     regions))
+
 
 (defun list-semantic-regions ()
   (sort (%list-semantic-regions) #'semantic-region-smaller))
