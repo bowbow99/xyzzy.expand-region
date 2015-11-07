@@ -260,9 +260,10 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
 
 (global-set-key '(#\C-c #\t) 'try-find-semantic-region)
 
-
-
-;aaaaa-bbbb
+(defun clear-semantic-regions ()
+  (unless (member *this-command* '(expand-region contract-region))
+    (setf *semantic-regions* nil)))
+(add-hook '*pre-command-hook* 'clear-semantic-regions)
 
 
 
