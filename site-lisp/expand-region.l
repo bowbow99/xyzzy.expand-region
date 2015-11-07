@@ -101,9 +101,6 @@
   (set-mark-command)
   (goto-char (semantic-region-end x)))
 
-
-
-
 
 ;;;; Semantic Region Finder
 
@@ -138,7 +135,6 @@ TAG   -- リージョンを識別する何か")
                     ((and (null $start) (null $end))
                       nil)))))
       (quit () nil))))
-
 
 (defmacro define-semantic-region (tag &body body)
   `(defun ,(sym "region/~A" tag) ()
@@ -202,8 +198,6 @@ TAG   -- リージョンを識別する何か")
 
 (defvar-local -semantic-regions- nil)
 
-
-
 (defun %find-semantic-region (finder)
   (ignore-errors
    (funcall finder)))
@@ -219,7 +213,6 @@ TAG   -- リージョンを識別する何か")
                   (pushnew region regions :test #'semantic-region-equal))))))
     regions))
 
-
 (defun list-semantic-regions ()
   (sort (%list-semantic-regions) #'semantic-region-smaller))
 
@@ -229,9 +222,6 @@ TAG   -- リージョンを識別する何か")
   (regionize-semantic-region-forward
    (nth (car *semantic-regions*)
         (cdr *semantic-regions*))))
-
-
-
 
 (defun expand-region (&optional arg)
   (interactive)
@@ -264,13 +254,8 @@ TAG   -- リージョンを識別する何か")
     (setf *semantic-regions* nil)))
 (add-hook '*pre-command-hook* 'clear-semantic-regions)
 
-
-
-
 (pushnew 'expand-region user::*rv-start-command-list*)
 (pushnew 'contract-region user::*rv-start-command-list*)
-
-
 
 
 (provide "expand-region")
