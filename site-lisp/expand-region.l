@@ -105,24 +105,25 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
 (defmacro find-semantic-region (tag &body body)
   (with-$gensyms
    `(handler-case
-        (let (($start nil)
-              ($end   nil))
-          (labels ((mark-start (&optional (point (point)))
-                     (setf $start point))
-                   (mark-end (&optional (point (point)))
-                     (setf $end point))
-                   ($return (&key (start $start) (end $end))
-                     (make-semantic-region
-                      :start start :end end :tag ',tag)))
-            ,@body
-            (cond ((and $start        $end)
-                    ($return))
-                  ((and $start        (null $end))
-                    ($return :end (point)))
-                  ((and (null $start) $end)
-                    ($return :start (point)))
-                  ((and (null $start) (null $end))
-                    nil))))
+        (save-excursion
+          (let (($start nil)
+                ($end   nil))
+            (labels ((mark-start (&optional (point (point)))
+                       (setf $start point))
+                     (mark-end (&optional (point (point)))
+                       (setf $end point))
+                     ($return (&key (start $start) (end $end))
+                       (make-semantic-region
+                        :start start :end end :tag ',tag)))
+              ,@body
+              (cond ((and $start        $end)
+                      ($return))
+                    ((and $start        (null $end))
+                      ($return :end (point)))
+                    ((and (null $start) $end)
+                      ($return :start (point)))
+                    ((and (null $start) (null $end))
+                      nil)))))
       (quit () nil))))
 
 
