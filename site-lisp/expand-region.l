@@ -198,14 +198,10 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ğ¯•Ê‚·‚é‰½‚©")
 
 (defvar-local -semantic-regions- nil)
 
-(defun %find-semantic-region (finder)
-  (ignore-errors
-   (funcall finder)))
-
 (defun %list-semantic-regions ()
   (let ((regions nil))
     (dolist (finder -find-semantic-region-functions-)
-      (awhen (%find-semantic-region finder)
+      (awhen (ignore-errors (funcall finder))
         (cond ((semantic-region-p it)
                 (pushnew it regions :test #'semantic-region-equal))
               ((listp it)
