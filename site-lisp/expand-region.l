@@ -240,15 +240,6 @@ TAG   -- ƒŠ[ƒWƒ‡ƒ“‚ðŽ¯•Ê‚·‚é‰½‚©")
 (global-set-key #\C-\, 'expand-region)
 (global-set-key #\C-\. 'contract-region)
 
-(defun try-find-semantic-region (finder)
-  (interactive "Sfinder> ")
-  (let ((*package* (find-package :expand-region)))
-    (msgbox "finder: ~S~%=> ~A"
-            finder
-            (%find-semantic-region finder))))
-
-(global-set-key '(#\C-c #\t) 'try-find-semantic-region)
-
 (defun clear-semantic-regions ()
   (unless (member *this-command* '(expand-region contract-region))
     (setf *semantic-regions* nil)))
