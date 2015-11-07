@@ -3,8 +3,8 @@ expand-region
 てきとーにリージョンを広げる。
 Emacs の同名拡張 [expand-region](https://github.com/magnars/expand-region.el) の説明から想像で実装したものです。
 
-詳細な説明
-----------
+詳細な説明 #FIXME
+-----------------
 
 
 
@@ -14,7 +14,9 @@ Emacs の同名拡張 [expand-region](https://github.com/magnars/expand-region.e
 ### 必要なもの
 * xyzzy
 
-### インストール＆設定
+### インストール＆設定 #FIXME
+
+
 
 
 その他
@@ -33,8 +35,10 @@ Emacs の同名拡張 [expand-region](https://github.com/magnars/expand-region.e
 * [bowbow99](https://github.com/bowbow99)
 
 ### ライセンス
+MIT です。
 
-Copyright (c) 2014 bowbow99
+
+Copyright (c) 2015 bowbow99
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
