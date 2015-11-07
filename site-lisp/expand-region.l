@@ -94,8 +94,7 @@
   (and (= (semantic-region-start a)
           (semantic-region-start b))
        (= (semantic-region-end a)
-          (semantic-region-end b))
-       (msgbox "These two are equal:~2%~A~%~A" a b)))
+          (semantic-region-end b))))
 
 (defun regionize-semantic-region-forward (x)
   (goto-char (semantic-region-start x))
