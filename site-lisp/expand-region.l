@@ -97,6 +97,12 @@
           (semantic-region-end b))
        (msgbox "These two are equal:~2%~A~%~A" a b)))
 
+(defun regionize-semantic-region-forward (x)
+  (goto-char (semantic-region-start x))
+  (set-mark-command)
+  (goto-char (semantic-region-end x)))
+
+
 
 
 
